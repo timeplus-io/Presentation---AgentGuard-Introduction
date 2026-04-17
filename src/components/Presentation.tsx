@@ -1,8 +1,11 @@
 import { ReactNode, createContext, useContext, useEffect, useRef, useState } from 'react';
 import { AnimatePresence, motion } from 'motion/react';
-import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { ChevronLeft, ChevronRight, List } from 'lucide-react';
 
 const StepContext = createContext<{ setStepHandler: (h: (() => boolean) | null) => void }>({ setStepHandler: () => {} });
+const NavContext = createContext<{ goToSlide: (index: number) => void }>({ goToSlide: () => {} });
+
+export function useSlideNav() { return useContext(NavContext); }
 
 export function useSlideStep(handler: (() => boolean) | null) {
   const { setStepHandler } = useContext(StepContext);
@@ -53,6 +56,13 @@ export function Presentation({ slides }: PresentationProps) {
     }
   };
 
+  const goToSlide = (index: number) => {
+    if (index === currentSlide) return;
+    stepHandler.current = null;
+    setDirection(index > currentSlide ? 1 : -1);
+    setCurrentSlide(index);
+  };
+
   const variants = {
     enter: (direction: number) => {
       return {
@@ -85,6 +95,7 @@ export function Presentation({ slides }: PresentationProps) {
           aspectRatio: '16 / 9'
         }}
       >
+        <NavContext.Provider value={{ goToSlide }}>
         <StepContext.Provider value={{ setStepHandler: h => { stepHandler.current = h; } }}>
           <AnimatePresence custom={direction}>
             <motion.div
@@ -105,6 +116,7 @@ export function Presentation({ slides }: PresentationProps) {
             </motion.div>
           </AnimatePresence>
         </StepContext.Provider>
+        </NavContext.Provider>
 
         {/* Controls — embedded bottom-right inside the slide */}
         <div className="absolute bottom-3 right-3 z-50 flex items-center gap-2 bg-white/80 backdrop-blur border border-gray-200 px-3 py-1.5 rounded-full shadow-md">
@@ -124,6 +136,15 @@ export function Presentation({ slides }: PresentationProps) {
             className="p-0.5 rounded-full hover:bg-gray-100 disabled:opacity-30 disabled:hover:bg-transparent text-gray-500 transition-colors"
           >
             <ChevronRight size={18} />
+          </button>
+          <div className="w-px h-4 bg-gray-200" />
+          <button
+            onClick={() => goToSlide(1)}
+            disabled={currentSlide === 1}
+            title="Table of Contents"
+            className="p-0.5 rounded-full hover:bg-gray-100 disabled:opacity-30 disabled:hover:bg-transparent text-gray-500 transition-colors"
+          >
+            <List size={18} />
           </button>
         </div>
       </div>
