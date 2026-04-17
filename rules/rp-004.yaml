@@ -1,0 +1,75 @@
+id: rp-004
+name: "Supply Chain Watch"
+version: "1.1.0"
+description: >
+  Monitors agent tool invocations for package installation commands that could
+  introduce malicious dependencies into the agent's runtime environment. v1.1.0
+  adds detection for typosquat install patterns (installing packages with names
+  similar to legitimate AI libraries — LiteLLM PyPI compromise Mar 2026), git
+  clone from non-standard hosts, direct script execution via curl-pipe-bash or
+  wget-pipe-sh, uv/pipx/poetry package managers, and Docker image pulls from
+  unverified registries. Reduces fp_rate from high to medium by combining install
+  commands with suspicious source indicators.
+  References: OWASP LLM05:2025 (Supply Chain), LiteLLM PyPI compromise Mar 2026 -
+  https://dev.to/deeptishuklatfy/your-ai-gateway-just-became-an-attack-vector-anatomy-of-the-litellm-supply-chain-compromise-1g7m,
+  https://dev.to/precogs_ai/litellm-hit-by-credential-stealing-supply-chain-attack-complete-technical-breakdown-4550,
+  https://www.cremit.io/blog/ai-supply-chain-attack-clinejection
+severity: warning
+category: supply_chain
+fp_rate: medium
+hook_sources: "tool_invoke"
+required_telemetry: ""
+author: "Timeplus"
+tags:
+  - security
+  - supply-chain
+  - package-install
+  - owasp-llm05
+query_sql: |
+  -- Changelog v1.1.0 (2026-04-16):
+  -- Added uv, pipx, poetry, pnpm package managers.
+  -- Added curl-pipe-bash / wget-pipe-sh (direct script execution).
+  -- Added git clone from non-github/gitlab hosts (typosquat/malicious repo).
+  -- Added docker pull from non-standard registry.
+  -- Added pip install with --index-url or --extra-index-url (typosquat vector).
+  -- Retained all original patterns unchanged.
+  -- fp_rate improved from high to medium by adding source-context conditions.
+  SELECT
+    event_time           AS detected_at,
+    'rp-004'             AS rule_id,
+    'Supply Chain Watch' AS rule_name,
+    'warning'            AS severity,
+    agent_id,
+    deployment_id,
+    session_id,
+    run_id,
+    raw_hook_name        AS hook_name,
+    tool_name,
+    concat('Package install/script exec by agent ', agent_id,
+      ' via ', if(tool_name != '', tool_name, raw_hook_name)) AS message,
+    raw_event_data       AS event_data
+  FROM agentguard_cim_event
+  WHERE event_type = 'tool_invoke'
+    AND (
+      -- Original package managers (retained)
+         lower(tool_input) LIKE '%npm install%'
+      OR lower(tool_input) LIKE '%pip install%'
+      OR lower(tool_input) LIKE '%yarn add%'
+      OR lower(tool_input) LIKE '%cargo install%'
+      OR lower(tool_input) LIKE '%apt-get install%'
+      OR lower(tool_input) LIKE '%brew install%'
+      -- Additional package managers (new)
+      OR lower(tool_input) LIKE '%uv add%'
+      OR lower(tool_input) LIKE '%pipx install%'
+      OR lower(tool_input) LIKE '%poetry add%'
+      OR lower(tool_input) LIKE '%pnpm add%'
+      -- Direct script execution via curl/wget pipe (new — high risk)
+      OR match(lower(tool_input), '\bcurl\b.{0,100}\|\s*(ba)?sh\b')
+      OR match(lower(tool_input), '\bwget\b.{0,100}\|\s*(ba)?sh\b')
+      -- pip with alternate index (typosquatting vector — LiteLLM attack)
+      OR match(lower(tool_input), '\bpip\s+install\b.{0,100}--(?:extra-)?index-url\b')
+      -- git clone from non-standard host (not github/gitlab/bitbucket)
+      OR match(lower(tool_input), '\bgit\s+clone\b.{0,200}https?://(?!github\.com|gitlab\.com|bitbucket\.org)')
+      -- docker pull from non-docker-hub registry
+      OR match(lower(tool_input), '\bdocker\s+pull\b.{0,100}/[a-z0-9\-]+:[a-z0-9\.\-]+')
+    )

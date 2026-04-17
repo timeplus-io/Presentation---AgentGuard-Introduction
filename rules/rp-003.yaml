@@ -1,0 +1,76 @@
+id: rp-003
+name: "Privilege Guard"
+version: "1.1.0"
+description: >
+  Monitors privilege escalation attempts through tool abuse, shell escapes, and
+  dangerous system commands in tool_invoke events. v1.1.0 adds shell metacharacter
+  injection patterns (backtick execution, $() subshell, semicolon chaining —
+  ATR-2026-00111), Python/Node code execution via tool arguments, environment
+  variable exfiltration commands (printenv, env | curl), container escape attempts
+  (nsenter, chroot, docker run --privileged), and crontab persistence.
+  References: OWASP LLM08:2025, ATR-2026-00111, CVE-2026-2256 -
+  https://agentthreatrule.org/en/rules/ATR-2026-00111,
+  https://security.snyk.io/vuln/SNYK-PYTHON-MSAGENT-15440541,
+  https://owasp.org/www-project-top-10-for-large-language-model-applications/
+severity: warning
+category: privilege
+fp_rate: low
+hook_sources: "tool_invoke"
+required_telemetry: ""
+author: "Timeplus"
+tags:
+  - security
+  - privilege-escalation
+  - shell-injection
+  - owasp-llm08
+query_sql: |
+  -- Changelog v1.1.0 (2026-04-16):
+  -- Added shell metacharacter injection: backtick, $(), semicolon chaining (ATR-2026-00111).
+  -- Added Python/Node inline exec via tool arguments.
+  -- Added env exfiltration commands (printenv, env | curl).
+  -- Added container escape patterns (nsenter, chroot, --privileged).
+  -- Added crontab persistence (crontab -e, /etc/cron).
+  -- Added /proc/self/environ read (credential harvesting from proc fs).
+  -- Retained all original patterns unchanged.
+  SELECT
+    event_time        AS detected_at,
+    'rp-003'          AS rule_id,
+    'Privilege Guard' AS rule_name,
+    'warning'         AS severity,
+    agent_id,
+    deployment_id,
+    session_id,
+    run_id,
+    raw_hook_name     AS hook_name,
+    tool_name,
+    concat('Dangerous command/tool: ', tool_name, ' by agent ', agent_id) AS message,
+    raw_event_data    AS event_data
+  FROM agentguard_cim_event
+  WHERE event_type = 'tool_invoke'
+    AND (
+      -- Original: dangerous tool names
+         lower(tool_name) IN ('bash', 'shell', 'exec', 'run_terminal_cmd', 'computer')
+      -- Original: dangerous command patterns
+      OR lower(tool_input) LIKE '%sudo %'
+      OR lower(tool_input) LIKE '%rm -rf%'
+      OR lower(tool_input) LIKE '%chmod%'
+      OR lower(tool_input) LIKE '%/etc/passwd%'
+      OR lower(tool_input) LIKE '%/etc/shadow%'
+      -- Shell metacharacter injection (ATR-2026-00111)
+      OR match(tool_input, '`[^`]{1,200}`')
+      OR match(tool_input, '\$\([^)]{1,200}\)')
+      OR match(tool_input, ';\s*(bash|sh|zsh|curl|wget|nc|python|node)\b')
+      -- Python/Node inline exec
+      OR match(lower(tool_input), '\bpython3?\s+-c\s+["\']')
+      OR match(lower(tool_input), '\bnode\s+-e\s+["\']')
+      -- Environment variable exfiltration
+      OR match(lower(tool_input), '\b(printenv|env)\s*(\||>)')
+      OR lower(tool_input) LIKE '%/proc/self/environ%'
+      -- Container escape
+      OR match(lower(tool_input), '\bnsenter\b')
+      OR match(lower(tool_input), '\bchroot\s+/')
+      OR lower(tool_input) LIKE '%--privileged%'
+      -- Crontab persistence
+      OR match(lower(tool_input), '\bcrontab\s+-[el]\b')
+      OR lower(tool_input) LIKE '%/etc/cron%'
+    )

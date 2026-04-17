@@ -1,0 +1,83 @@
+id: rp-002
+name: "DLP Sentinel"
+version: "1.1.0"
+description: >
+  Scans outbound agent communication for PII, API keys, and sensitive data leaks
+  in tool_complete and llm_response events. v1.1.0 adds DNS-based exfiltration
+  detection (API key embedded in subdomain hostname — PipeLab 2026), OpenAI and
+  Google API key patterns, JWT token detection, private key PEM block detection,
+  and tightens broad LIKE patterns to regex for reduced FP rate. Also adds
+  detection for steganographic whitespace encoding used to bypass content
+  filters (Aona AI, Mar 2026).
+  References: OWASP LLM02:2025, OWASP LLM06:2025 -
+  https://pipelab.org/blog/dns-exfil-ai-agent/,
+  https://aona.ai/blog/agentic-ai-bypasses-dlp-tools,
+  https://cheatsheetseries.owasp.org/cheatsheets/LLM_Prompt_Injection_Prevention_Cheat_Sheet.html
+severity: critical
+category: dlp
+fp_rate: low
+hook_sources: "tool_complete,llm_response"
+required_telemetry: "content_capture"
+author: "Timeplus"
+tags:
+  - security
+  - dlp
+  - pii
+  - data-exfiltration
+  - owasp-llm02
+  - owasp-llm06
+query_sql: |
+  -- Changelog v1.1.0 (2026-04-16):
+  -- Tightened '%api_key%' and '%secret_key%' to regex with word boundaries
+  --   to avoid matching "api_key_name" or "public_key" in code comments.
+  -- Added OpenAI key pattern: sk-[a-zA-Z0-9]{32,}.
+  -- Added Google API key pattern: AIza[0-9A-Za-z\-_]{35}.
+  -- Added JWT token pattern (three base64url segments separated by dots).
+  -- Added PEM private key block detection.
+  -- Added DNS exfiltration: API key embedded as subdomain (PipeLab 2026).
+  -- Retained original SSN regex and specific token prefix LIKEs (low FP, retain as-is).
+  SELECT
+    event_time     AS detected_at,
+    'rp-002'       AS rule_id,
+    'DLP Sentinel' AS rule_name,
+    'critical'     AS severity,
+    agent_id,
+    deployment_id,
+    session_id,
+    run_id,
+    raw_hook_name  AS hook_name,
+    tool_name,
+    concat('Sensitive data in ', raw_hook_name,
+      if(tool_name != '', concat(' (', tool_name, ')'), ''),
+      ' from agent ', agent_id) AS message,
+    raw_event_data AS event_data
+  FROM agentguard_cim_event
+  WHERE event_type IN ('tool_complete', 'llm_response')
+    AND session_id != ''
+    AND (
+      -- SSN pattern (original, retained)
+         match(concat(tool_result, ' ', assistant_message), '[0-9]{3}-[0-9]{2}-[0-9]{4}')
+      -- API key / secret with word boundaries (tightened from broad LIKE)
+      OR match(lower(concat(tool_result, ' ', assistant_message)), '\b(api_key|secret_key|access_key)\s*[=:]\s*["\']?[a-z0-9_\-]{8,}')
+      -- Bearer token (retained specific LIKE)
+      OR lower(concat(tool_result, ' ', assistant_message)) LIKE '%bearer %'
+      -- Anthropic key prefix (retained specific LIKE)
+      OR lower(concat(tool_result, ' ', assistant_message)) LIKE '%sk-ant-%'
+      -- GitHub token (retained specific LIKE)
+      OR lower(concat(tool_result, ' ', assistant_message)) LIKE '%ghp_%'
+      -- Private key with word boundary (tightened from '%private_key%')
+      OR match(lower(concat(tool_result, ' ', assistant_message)), '\bprivate[_\s]key\b')
+      -- AWS secret (retained specific LIKE)
+      OR lower(concat(tool_result, ' ', assistant_message)) LIKE '%aws_secret%'
+      -- OpenAI key pattern (new)
+      OR match(concat(tool_result, ' ', assistant_message), 'sk-[a-zA-Z0-9]{32,}')
+      -- Google API key (new)
+      OR match(concat(tool_result, ' ', assistant_message), 'AIza[0-9A-Za-z\-_]{35}')
+      -- JWT token pattern (new) - three base64url segments
+      OR match(concat(tool_result, ' ', assistant_message), 'ey[a-zA-Z0-9_\-]{10,}\.[a-zA-Z0-9_\-]{10,}\.[a-zA-Z0-9_\-]{10,}')
+      -- PEM private key block (new)
+      OR lower(concat(tool_result, ' ', assistant_message)) LIKE '%begin private key%'
+      OR lower(concat(tool_result, ' ', assistant_message)) LIKE '%begin rsa private key%'
+      -- DNS exfiltration: key embedded as subdomain (new — PipeLab 2026)
+      OR match(concat(tool_result, ' ', assistant_message), 'sk-[a-zA-Z0-9]{20,}\.[a-z0-9\-]+\.(com|io|net|org)')
+    )

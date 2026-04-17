@@ -1,0 +1,63 @@
+@import "tailwindcss";
+
+@theme {
+  --color-gray-100: #120F1A;
+  --color-gray-200: #231F2B;
+  --color-gray-300: #3A3741;
+  --color-gray-400: #514E58;
+  --color-gray-500: #7D7B82;
+  --color-gray-600: #B5B4B8;
+  --color-gray-700: #DAD9DB;
+  --color-gray-800: #ECECED;
+  --color-gray-900: #F7F6F6;
+  --color-pink-400: #B83280;
+  --color-pink-500: #D53F8C;
+  --color-red-400: #751025;
+  --color-red-500: #D12D50;
+  --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+}
+
+@layer base {
+  body {
+    font-family: var(--font-sans);
+    font-size: 14px;
+    line-height: 1.5;
+    color: var(--color-gray-100);
+    background-color: var(--color-gray-900);
+  }
+
+  h1 {
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--color-gray-200);
+    line-height: 1.4;
+  }
+
+  h2 {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--color-gray-200);
+    line-height: 1.4;
+  }
+
+  h3 {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--color-gray-200);
+    line-height: 1.4;
+  }
+
+  p {
+    font-size: 14px;
+    font-weight: 400;
+    color: var(--color-gray-100);
+    line-height: 1.5;
+  }
+}
+
+html, body, #root {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+}
