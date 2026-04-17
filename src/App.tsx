@@ -1,16 +1,16 @@
 import { Presentation } from './components/Presentation';
-import { TitleSlide } from './slides/TitleSlide';
-import { StatusSlide } from './slides/StatusSlide';
-import { SecurityGapSlide } from './slides/SecurityGapSlide';
-import { FallShortSlide } from './slides/FallShortSlide';
-import { CapabilitiesSlide } from './slides/CapabilitiesSlide';
-import { ArchitectureSlide } from './slides/ArchitectureSlide';
-import { DataCollectionSlide } from './slides/DataCollectionSlide';
-import { CIMSlide } from './slides/CIMSlide';
-import { StreamingDetectionSlide } from './slides/StreamingDetectionSlide';
-import { AlertPipelineSlide } from './slides/AlertPipelineSlide';
-import { DemoSlide } from './slides/DemoSlide';
-import { CallToActionSlide } from './slides/CallToActionSlide';
+import { TitleSlide } from './slides/01_TitleSlide';
+import { StatusSlide } from './slides/02_StatusSlide';
+import { SecurityGapSlide } from './slides/03_SecurityGapSlide';
+import { FallShortSlide } from './slides/04_FallShortSlide';
+import { CapabilitiesSlide } from './slides/05_CapabilitiesSlide';
+import { ArchitectureSlide } from './slides/06_ArchitectureSlide';
+import { DataCollectionSlide } from './slides/07_DataCollectionSlide';
+import { CIMSlide } from './slides/08_CIMSlide';
+import { StreamingDetectionSlide } from './slides/09_StreamingDetectionSlide';
+import { AlertPipelineSlide } from './slides/10_AlertPipelineSlide';
+import { DemoSlide } from './slides/11_DemoSlide';
+import { CallToActionSlide } from './slides/12_CallToActionSlide';
 
 export default function App() {
   const slides = [
