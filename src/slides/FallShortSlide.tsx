@@ -1,9 +1,21 @@
+import { useCallback, useState } from 'react';
 import { motion } from 'motion/react';
-import { SlideLayout } from '../components/Presentation';
+import { SlideLayout, useSlideStep } from '../components/Presentation';
 import { Clock, Zap, Network, AlertTriangle, FileJson, Unlink, Layers, ArrowRight, ShieldCheck, DatabaseZap } from 'lucide-react';
 import timeplusLogo from '../assets/timeplus-circles_for-light-bg.svg';
 
+const TOTAL_STEPS = 4;
+
 export function FallShortSlide() {
+  const [revealed, setRevealed] = useState(0);
+  const stepHandler = useCallback(() => {
+    if (revealed < TOTAL_STEPS) { setRevealed(n => n + 1); return true; }
+    return false;
+  }, [revealed]);
+  useSlideStep(revealed < TOTAL_STEPS ? stepHandler : null);
+
+  const show = (n: number) => revealed >= n;
+
   return (
     <SlideLayout 
       title="Why Existing Tools Fall Short" 
@@ -15,10 +27,10 @@ export function FallShortSlide() {
         <div className="flex flex-1 gap-5 min-h-0">
           
           {/* 1. Speed Mismatch */}
-          <motion.div 
+          <motion.div
             initial={{ opacity: 0, y: 15 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.1 }}
+            animate={show(1) ? { opacity: 1, y: 0 } : { opacity: 0, y: 15 }}
+            transition={{ duration: 0.4 }}
             className="flex-1 bg-white border border-gray-700 rounded-xl p-6 flex flex-col relative overflow-hidden group hover:border-pink-500/40 transition-colors"
           >
             <div className="mb-4 flex items-center gap-3">
@@ -43,10 +55,10 @@ export function FallShortSlide() {
           </motion.div>
 
           {/* 2. Context Blindspots */}
-          <motion.div 
+          <motion.div
             initial={{ opacity: 0, y: 15 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.3 }}
+            animate={show(2) ? { opacity: 1, y: 0 } : { opacity: 0, y: 15 }}
+            transition={{ duration: 0.4 }}
             className="flex-1 bg-white border border-gray-700 rounded-xl p-6 flex flex-col relative overflow-hidden group hover:border-pink-500/40 transition-colors"
           >
             <div className="mb-4 flex items-center gap-3">
@@ -80,10 +92,10 @@ export function FallShortSlide() {
           </motion.div>
 
           {/* 3. Heterogeneity */}
-          <motion.div 
+          <motion.div
             initial={{ opacity: 0, y: 15 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.5 }}
+            animate={show(3) ? { opacity: 1, y: 0 } : { opacity: 0, y: 15 }}
+            transition={{ duration: 0.4 }}
             className="flex-1 bg-white border border-gray-700 rounded-xl p-6 flex flex-col relative overflow-hidden group hover:border-pink-500/40 transition-colors"
           >
              <div className="mb-4 flex items-center gap-3">
@@ -116,10 +128,10 @@ export function FallShortSlide() {
         </div>
 
         {/* Bottom Solution Panel */}
-        <motion.div 
+        <motion.div
           initial={{ opacity: 0, y: 15 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.8 }}
+          animate={show(4) ? { opacity: 1, y: 0 } : { opacity: 0, y: 15 }}
+          transition={{ duration: 0.4 }}
           className="shrink-0 bg-[#F7F6F6] border border-gray-300 rounded-xl p-3 flex items-center justify-between"
         >
           <div className="flex-1 pr-4">

@@ -1,9 +1,21 @@
+import { useCallback, useState } from 'react';
 import { LayoutDashboard, ShieldAlert, DollarSign, DatabaseZap, Network, FileDown, Layers } from 'lucide-react';
 import timeplusLogo from '../assets/timeplus-circles_for-light-bg.svg';
 import { motion } from 'motion/react';
-import { SlideLayout } from '../components/Presentation';
+import { SlideLayout, useSlideStep } from '../components/Presentation';
+
+const TOTAL_STEPS = 4;
 
 export function CapabilitiesSlide() {
+  const [revealed, setRevealed] = useState(0);
+  const stepHandler = useCallback(() => {
+    if (revealed < TOTAL_STEPS) { setRevealed(n => n + 1); return true; }
+    return false;
+  }, [revealed]);
+  useSlideStep(revealed < TOTAL_STEPS ? stepHandler : null);
+
+  const show = (n: number) => revealed >= n;
+
   const capabilities = [
     { 
       icon: <LayoutDashboard size={24} />, 
@@ -45,8 +57,10 @@ export function CapabilitiesSlide() {
            <div className="absolute left-[15%] right-[15%] top-[40%] -translate-y-1/2 h-1.5 bg-pink-100 z-0 rounded-full"></div>
 
            {/* Step 1 */}
-           <motion.div 
-             initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}
+           <motion.div
+             initial={{ opacity: 0, y: 15 }}
+             animate={show(1) ? { opacity: 1, y: 0 } : { opacity: 0, y: 15 }}
+             transition={{ duration: 0.4 }}
              className="relative z-10 flex-[1] bg-white border border-gray-100 rounded-3xl p-5 pt-8 shadow-[0_8px_30px_rgb(0,0,0,0.04)] flex flex-col items-center text-center overflow-visible group hover:-translate-y-1 transition-transform"
            >
              <div className="absolute -top-6 left-1/2 -translate-x-1/2 w-12 h-12 rounded-2xl bg-pink-500 text-white font-black text-xl flex items-center justify-center border-4 border-[#F7F6F6] shadow-md group-hover:rotate-6 transition-transform">1</div>
@@ -56,8 +70,10 @@ export function CapabilitiesSlide() {
            </motion.div>
 
            {/* Step 2 */}
-           <motion.div 
-             initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}
+           <motion.div
+             initial={{ opacity: 0, y: 15 }}
+             animate={show(2) ? { opacity: 1, y: 0 } : { opacity: 0, y: 15 }}
+             transition={{ duration: 0.4 }}
              className="relative z-10 flex-[1] bg-white border border-gray-100 rounded-3xl p-5 pt-8 shadow-[0_8px_30px_rgb(0,0,0,0.04)] flex flex-col items-center text-center overflow-visible group hover:-translate-y-1 transition-transform"
            >
              <div className="absolute -top-6 left-1/2 -translate-x-1/2 w-12 h-12 rounded-2xl bg-pink-500 text-white font-black text-xl flex items-center justify-center border-4 border-[#F7F6F6] shadow-md group-hover:-rotate-6 transition-transform">2</div>
@@ -67,8 +83,10 @@ export function CapabilitiesSlide() {
            </motion.div>
 
            {/* Step 3 */}
-           <motion.div 
-             initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }}
+           <motion.div
+             initial={{ opacity: 0, y: 15 }}
+             animate={show(3) ? { opacity: 1, y: 0 } : { opacity: 0, y: 15 }}
+             transition={{ duration: 0.4 }}
              className="relative z-10 flex-[1] bg-white border border-gray-100 rounded-3xl p-5 pt-8 shadow-[0_8px_30px_rgb(0,0,0,0.04)] flex flex-col items-center text-center overflow-visible group hover:-translate-y-1 transition-transform"
            >
              <div className="absolute -top-6 left-1/2 -translate-x-1/2 w-12 h-12 rounded-2xl bg-pink-500 text-white font-black text-xl flex items-center justify-center border-4 border-[#F7F6F6] shadow-md group-hover:rotate-6 transition-transform">3</div>
@@ -81,11 +99,11 @@ export function CapabilitiesSlide() {
         {/* AntV Inspired: List Grid Candy Card Lite */}
         <div className="grid grid-cols-2 gap-x-6 gap-y-4 min-h-0 flex-1 mt-2">
           {capabilities.map((c, i) => (
-            <motion.div 
+            <motion.div
               key={i}
               initial={{ x: -20, opacity: 0 }}
-              animate={{ x: 0, opacity: 1 }}
-              transition={{ delay: 0.4 + (i * 0.1) }}
+              animate={show(4) ? { x: 0, opacity: 1 } : { x: -20, opacity: 0 }}
+              transition={{ duration: 0.4, delay: i * 0.07 }}
               className={`bg-white border-l-4 border-l-pink-400 border-y border-r border-gray-100 px-5 py-4 rounded-2xl flex items-center gap-5 hover:bg-pink-50/20 shadow-[0_4px_20px_rgb(0,0,0,0.02)] transition-all group ${i === 4 ? 'col-span-2 w-2/3 mx-auto' : ''}`}
             >
               <div className="w-14 h-14 rounded-2xl bg-pink-50 flex shrink-0 items-center justify-center text-pink-500 group-hover:scale-110 transition-transform shadow-sm border border-pink-100">

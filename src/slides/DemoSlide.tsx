@@ -1,5 +1,5 @@
 import { SlideLayout } from '../components/Presentation';
-import demoVideo from '../assets/Agentguard Quick Demo - Scenario 9.mp4';
+import demoVideo from '../assets/AgentGuardDemo.mp4';
 
 export function DemoSlide() {
   return (

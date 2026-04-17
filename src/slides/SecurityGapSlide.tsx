@@ -1,25 +1,33 @@
+import { useCallback, useState } from 'react';
 import { motion } from 'motion/react';
-import { SlideLayout } from '../components/Presentation';
-import { Bug, FileWarning, ShieldAlert, EyeOff, ShieldQuestion } from 'lucide-react';
+import { SlideLayout, useSlideStep } from '../components/Presentation';
+import { Bug, FileWarning, ShieldAlert, EyeOff, ShieldQuestion, ExternalLink } from 'lucide-react';
 
 export function SecurityGapSlide() {
+  const [showBanner, setShowBanner] = useState(false);
+  const stepHandler = useCallback(() => { setShowBanner(true); return true; }, []);
+  useSlideStep(showBanner ? null : stepHandler);
+
   const threats = [
     {
       icon: <Bug size={20} />,
       title: 'Month of AI Bugs',
       source: 'Johann Rehberger, Aug 2025',
+      url: 'https://embracethered.com/blog/posts/2025/announcement-the-month-of-ai-bugs/',
       desc: 'Prompt injection vulnerabilities demonstrated across every major AI platform tested — each assigned a formal CVE.'
     },
     {
       icon: <FileWarning size={20} />,
       title: 'Invisible Backdoors',
       source: 'Pillar Security',
+      url: 'https://www.pillar.security/blog/new-vulnerability-in-github-copilot-and-cursor-how-hackers-can-weaponize-code-agents',
       desc: 'Invisible Unicode characters in agent configuration files directed agents to inject backdoors into all subsequent outputs.'
     },
     {
       icon: <ShieldAlert size={20} />,
       title: 'OWASP Top 10 for Agents',
       source: 'Released Dec 2025',
+      url: 'https://genai.owasp.org/resource/owasp-top-10-for-agentic-applications-for-2026/',
       desc: 'Codified ten categories of agent-specific threats including excessive permissions, prompt injection, and trust breakdowns.'
     }
   ];
@@ -50,7 +58,10 @@ export function SecurityGapSlide() {
                 <div>
                   <div className="flex items-baseline justify-between mb-1 gap-2">
                     <h4 className="font-bold text-gray-100 text-sm">{threat.title}</h4>
-                    <span className="text-[10px] text-gray-500 font-mono tracking-tighter whitespace-nowrap">{threat.source}</span>
+                    <a href={threat.url} target="_blank" rel="noopener noreferrer"
+                      className="text-[10px] text-gray-500 font-mono tracking-tighter whitespace-nowrap hover:text-pink-500 transition-colors flex items-center gap-0.5">
+                      {threat.source} <ExternalLink size={8} />
+                    </a>
                   </div>
                   <p className="text-xs text-gray-400 leading-relaxed font-medium">{threat.desc}</p>
                 </div>
@@ -69,7 +80,10 @@ export function SecurityGapSlide() {
               transition={{ delay: 0.4 }}
               className="bg-white border border-gray-700 p-5 rounded-xl shadow-sm flex flex-col justify-center"
             >
-              <div className="text-[10px] text-gray-400 uppercase font-bold tracking-widest mb-4">Cybersecurity Insiders</div>
+              <a href="https://www.cybersecurity-insiders.com/ai-risk-and-readiness-report-2026/" target="_blank" rel="noopener noreferrer"
+                className="text-[10px] text-gray-400 uppercase font-bold tracking-widest mb-4 flex items-center gap-1 hover:text-pink-500 transition-colors w-fit">
+                Cybersecurity Insiders <ExternalLink size={8} />
+              </a>
               <div className="space-y-4">
                 <div>
                   <div className="flex justify-between text-sm font-bold text-gray-100 mb-1.5">
@@ -98,7 +112,10 @@ export function SecurityGapSlide() {
                 transition={{ delay: 0.5 }}
                 className="flex-1 bg-white border border-gray-700 p-5 rounded-xl shadow-sm flex flex-col"
               >
-                <div className="text-[10px] text-gray-400 uppercase font-bold tracking-widest mb-4">NeuralTrust CISOs</div>
+                <a href="https://www.prnewswire.com/news-releases/the-state-of-ai-agent-security-73-of-cisos-fear-ai-agent-risks-but-only-30-are-ready-302607386.html" target="_blank" rel="noopener noreferrer"
+                  className="text-[10px] text-gray-400 uppercase font-bold tracking-widest mb-4 flex items-center gap-1 hover:text-pink-500 transition-colors w-fit">
+                  NeuralTrust CISOs <ExternalLink size={8} />
+                </a>
                 <div className="flex flex-col h-full justify-around mt-1">
                   <div className="flex items-center gap-3">
                     <span className="w-8 text-right font-bold text-gray-200 text-lg">73%</span>
@@ -120,7 +137,10 @@ export function SecurityGapSlide() {
                 className="flex-[0.8] bg-white border border-gray-700 p-5 rounded-xl shadow-sm flex flex-col items-center justify-center text-center relative overflow-hidden"
               >
                 <EyeOff className="absolute -right-4 -bottom-4 w-24 h-24 text-gray-800/50" />
-                <div className="text-[10px] text-gray-400 uppercase font-bold tracking-widest mb-2 z-10">Akto Report</div>
+                <a href="https://www.akto.io/blog/state-of-agentic-ai-security-2025" target="_blank" rel="noopener noreferrer"
+                  className="text-[10px] text-gray-400 uppercase font-bold tracking-widest mb-2 z-10 flex items-center gap-1 hover:text-pink-500 transition-colors">
+                  Akto Report <ExternalLink size={8} />
+                </a>
                 <div className="text-4xl font-bold text-red-500 tracking-tighter mb-1 z-10">79%</div>
                 <p className="text-[11px] font-semibold text-gray-300 z-10 leading-snug">
                   of enterprises operate with <span className="text-gray-100 font-bold">unobservable security blindspots</span>.
@@ -130,11 +150,11 @@ export function SecurityGapSlide() {
           </div>
         </div>
 
-        {/* Bottom Banner */}
-        <motion.div 
+        {/* Bottom Banner — revealed on first space/click */}
+        <motion.div
           initial={{ opacity: 0, scaleY: 0.9 }}
-          animate={{ opacity: 1, scaleY: 1 }}
-          transition={{ delay: 0.9 }}
+          animate={showBanner ? { opacity: 1, scaleY: 1 } : { opacity: 0, scaleY: 0.9 }}
+          transition={{ duration: 0.4 }}
           className="shrink-0 bg-pink-500 rounded-xl p-5 shadow-xl flex items-center justify-between border border-pink-400"
         >
           <div className="flex items-center gap-4">

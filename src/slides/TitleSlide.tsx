@@ -1,6 +1,7 @@
 import { ShieldCheck, Bot, Activity } from 'lucide-react';
 import { motion } from 'motion/react';
 import agentGuardLogo from '../assets/timeplus-agentguard_logo-pink.svg';
+import mascot from '../assets/AgentGuard Tabby.png';
 
 export function TitleSlide() {
   return (
@@ -8,14 +9,24 @@ export function TitleSlide() {
       
       {/* Left part: Title and Text */}
       <div className="flex-1 flex flex-col items-start justify-center text-left z-10 w-1/2">
-        <motion.img
-          src={agentGuardLogo}
-          alt="AgentGuard"
-          initial={{ y: 20, opacity: 0 }}
-          animate={{ y: 0, opacity: 1 }}
-          transition={{ delay: 0.3 }}
-          className="mb-6 h-24 lg:h-28 w-auto drop-shadow-lg"
-        />
+        <div className="relative mb-6 self-start">
+          <motion.img
+            src={mascot}
+            alt="AgentGuard Tabby"
+            initial={{ y: 10, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            transition={{ delay: 0.2 }}
+            className="absolute -top-10 -left-6 h-16 w-auto drop-shadow-lg z-10"
+          />
+          <motion.img
+            src={agentGuardLogo}
+            alt="AgentGuard"
+            initial={{ y: 20, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            transition={{ delay: 0.3 }}
+            className="h-24 lg:h-28 w-auto drop-shadow-lg"
+          />
+        </div>
         
         <motion.p 
           initial={{ y: 20, opacity: 0 }}

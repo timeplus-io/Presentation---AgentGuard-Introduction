@@ -1,8 +1,20 @@
+import { useCallback, useState } from 'react';
 import { motion } from 'motion/react';
-import { SlideLayout } from '../components/Presentation';
+import { SlideLayout, useSlideStep } from '../components/Presentation';
 import { Bot, DatabaseZap, Server, Layers, Filter, ShieldAlert, ArrowDown, ArrowRight, Share2, Activity, ShieldCheck, Zap } from 'lucide-react';
 
+const TOTAL_STEPS = 4;
+
 export function ArchitectureSlide() {
+  const [revealed, setRevealed] = useState(0);
+  const stepHandler = useCallback(() => {
+    if (revealed < TOTAL_STEPS) { setRevealed(n => n + 1); return true; }
+    return false;
+  }, [revealed]);
+  useSlideStep(revealed < TOTAL_STEPS ? stepHandler : null);
+
+  const show = (n: number) => revealed >= n;
+
   return (
     <SlideLayout 
       title="How AgentGuard Is Designed" 
@@ -11,12 +23,16 @@ export function ArchitectureSlide() {
       <div className="flex h-full gap-8 pt-4 pb-2 px-2">
         
         {/* Left Side: The Pipeline Diagram */}
-        <div className="flex-[0.8] flex flex-col gap-1 relative">
+        <motion.div
+          initial={{ opacity: 0, x: -20 }}
+          animate={show(1) ? { opacity: 1, x: 0 } : { opacity: 0, x: -20 }}
+          transition={{ duration: 0.4 }}
+          className="flex-[0.8] flex flex-col gap-1 relative"
+        >
 
           {/* Layer 1: Agents */}
           <motion.div
-            initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}
-            className="bg-white border border-gray-200 rounded-2xl p-3 shadow-[0_4px_20px_rgb(0,0,0,0.02)] relative z-10"
+                        className="bg-white border border-gray-200 rounded-2xl p-3 shadow-[0_4px_20px_rgb(0,0,0,0.02)] relative z-10"
           >
             <div className="flex items-center gap-2 mb-2">
               <div className="bg-pink-50 p-2 rounded-lg text-pink-500"><Bot size={16} /></div>
@@ -41,8 +57,7 @@ export function ArchitectureSlide() {
 
           {/* Layer 2: Timeplus Engine */}
           <motion.div
-            initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }}
-            className="bg-white border-2 border-pink-100 rounded-2xl p-3 shadow-[0_8px_30px_rgb(0,0,0,0.04)] relative z-10"
+                        className="bg-white border-2 border-pink-100 rounded-2xl p-3 shadow-[0_8px_30px_rgb(0,0,0,0.04)] relative z-10"
           >
             <div className="flex items-center gap-2 mb-2">
               <div className="bg-pink-500 text-white p-2 rounded-lg"><DatabaseZap size={16} /></div>
@@ -101,8 +116,7 @@ export function ArchitectureSlide() {
 
           {/* Layer 3: Backend */}
           <motion.div
-            initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.5 }}
-            className="bg-white border border-blue-200 rounded-2xl p-3 shadow-[0_4px_20px_rgb(0,0,0,0.02)] relative z-10"
+                        className="bg-white border border-blue-200 rounded-2xl p-3 shadow-[0_4px_20px_rgb(0,0,0,0.02)] relative z-10"
           >
             <div className="flex items-center gap-2 mb-2">
               <div className="bg-blue-50 p-2 rounded-lg text-blue-500"><Server size={16} /></div>
@@ -115,12 +129,12 @@ export function ArchitectureSlide() {
             </div>
           </motion.div>
 
-        </div>
+        </motion.div>
 
         {/* Right Side: The Concepts */}
         <div className="flex-1 flex flex-col pt-4 gap-6">
           
-          <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.2 }}>
+          <motion.div initial={{ opacity: 0, x: 20 }} animate={show(2) ? { opacity: 1, x: 0 } : { opacity: 0, x: 20 }} transition={{ duration: 0.4 }}>
             <h3 className="text-xl font-black text-[black] mb-2 flex items-center gap-3 tracking-tight">
               <div className="w-8 h-8 rounded-lg bg-pink-50 text-pink-500 flex items-center justify-center shadow-sm"><Share2 size={16} /></div>
               Common Information Model
@@ -130,7 +144,7 @@ export function ArchitectureSlide() {
             </p>
           </motion.div>
 
-          <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.4 }}>
+          <motion.div initial={{ opacity: 0, x: 20 }} animate={show(3) ? { opacity: 1, x: 0 } : { opacity: 0, x: 20 }} transition={{ duration: 0.4 }}>
             <h3 className="text-xl font-black text-[black] mb-2 flex items-center gap-3 tracking-tight">
               <div className="w-8 h-8 rounded-lg bg-red-50 text-red-500 flex items-center justify-center shadow-sm"><ShieldAlert size={16} /></div>
               Stateful Threat Pipeline
@@ -140,7 +154,7 @@ export function ArchitectureSlide() {
             </p>
           </motion.div>
 
-          <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.6 }}>
+          <motion.div initial={{ opacity: 0, x: 20 }} animate={show(4) ? { opacity: 1, x: 0 } : { opacity: 0, x: 20 }} transition={{ duration: 0.4 }}>
             <h3 className="text-xl font-black text-[black] mb-2 flex items-center gap-3 tracking-tight">
               <div className="w-8 h-8 rounded-lg bg-blue-50 text-blue-500 flex items-center justify-center shadow-sm"><Activity size={16} /></div>
               Live Server-Sent Events

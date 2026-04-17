@@ -1,6 +1,17 @@
-import { ReactNode, useEffect, useRef, useState } from 'react';
+import { ReactNode, createContext, useContext, useEffect, useRef, useState } from 'react';
 import { AnimatePresence, motion } from 'motion/react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
+
+const StepContext = createContext<{ setStepHandler: (h: (() => boolean) | null) => void }>({ setStepHandler: () => {} });
+
+export function useSlideStep(handler: (() => boolean) | null) {
+  const { setStepHandler } = useContext(StepContext);
+  useEffect(() => {
+    setStepHandler(handler);
+    // No cleanup: clearing is handled by Presentation on navigation.
+    // Cleanup here would race with the entering slide's registration during exit animations.
+  }, [handler]);
+}
 
 interface PresentationProps {
   slides: ReactNode[];
@@ -10,6 +21,7 @@ export function Presentation({ slides }: PresentationProps) {
   const [currentSlide, setCurrentSlide] = useState(0);
   const [direction, setDirection] = useState(0);
   const isFirst = useRef(true);
+  const stepHandler = useRef<(() => boolean) | null>(null);
   useEffect(() => { isFirst.current = false; }, []);
 
   useEffect(() => {
@@ -25,6 +37,8 @@ export function Presentation({ slides }: PresentationProps) {
   }, [currentSlide, slides.length]);
 
   const nextSlide = () => {
+    if (stepHandler.current && stepHandler.current()) return;
+    stepHandler.current = null;
     if (currentSlide < slides.length - 1) {
       setDirection(1);
       setCurrentSlide(prev => prev + 1);
@@ -32,6 +46,7 @@ export function Presentation({ slides }: PresentationProps) {
   };
 
   const prevSlide = () => {
+    stepHandler.current = null;
     if (currentSlide > 0) {
       setDirection(-1);
       setCurrentSlide(prev => prev - 1);
@@ -70,23 +85,26 @@ export function Presentation({ slides }: PresentationProps) {
           aspectRatio: '16 / 9'
         }}
       >
-        <AnimatePresence custom={direction}>
-          <motion.div
-            key={currentSlide}
-            custom={direction}
-            variants={variants}
-            initial={isFirst.current ? { x: 0, opacity: 0 } : 'enter'}
-            animate="center"
-            exit="exit"
-            transition={{
-              x: { type: "spring", stiffness: 300, damping: 30 },
-              opacity: { duration: 0.2 }
-            }}
-            className="absolute inset-0 w-full h-full p-8 md:p-12 flex flex-col"
-          >
-            {slides[currentSlide]}
-          </motion.div>
-        </AnimatePresence>
+        <StepContext.Provider value={{ setStepHandler: h => { stepHandler.current = h; } }}>
+          <AnimatePresence custom={direction}>
+            <motion.div
+              key={currentSlide}
+              custom={direction}
+              variants={variants}
+              initial={isFirst.current ? { x: 0, opacity: 0 } : 'enter'}
+              animate="center"
+              exit="exit"
+              transition={{
+                x: { type: "spring", stiffness: 300, damping: 30 },
+                opacity: { duration: 0.2 }
+              }}
+              className="absolute inset-0 w-full h-full p-8 md:p-12 flex flex-col cursor-pointer"
+              onClick={nextSlide}
+            >
+              {slides[currentSlide]}
+            </motion.div>
+          </AnimatePresence>
+        </StepContext.Provider>
 
         {/* Controls — embedded bottom-right inside the slide */}
         <div className="absolute bottom-3 right-3 z-50 flex items-center gap-2 bg-white/80 backdrop-blur border border-gray-200 px-3 py-1.5 rounded-full shadow-md">

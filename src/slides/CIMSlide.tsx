@@ -1,8 +1,11 @@
+import { ReactNode, useCallback, useState } from 'react';
 import { motion } from 'motion/react';
-import { SlideLayout } from '../components/Presentation';
+import { SlideLayout, useSlideStep } from '../components/Presentation';
 import { BarChart2, Layers } from 'lucide-react';
 import claudeLogo from '../assets/claude-seeklogo.svg';
 import openClawLogo from '../assets/openclaw-dark.svg';
+
+const TOTAL_STEPS = 4;
 
 const mismatchRows = [
   { concern: 'User message', openclaw: 'message_received', claude: 'user_prompt_submit' },
@@ -25,7 +28,7 @@ function FlowDot({ color, delay }: { color: string; delay: number }) {
   );
 }
 
-function Pipe({ color, children }: { color: string; children: React.ReactNode }) {
+function Pipe({ color, children }: { color: string; children: ReactNode }) {
   return (
     <div className="relative flex-1 h-1.5 overflow-visible flex items-center">
       <div className={`w-full h-0.5 ${color}`} />
@@ -35,6 +38,14 @@ function Pipe({ color, children }: { color: string; children: React.ReactNode })
 }
 
 export function CIMSlide() {
+  const [revealed, setRevealed] = useState(0);
+  const stepHandler = useCallback(() => {
+    if (revealed < TOTAL_STEPS) { setRevealed(n => n + 1); return true; }
+    return false;
+  }, [revealed]);
+  useSlideStep(revealed < TOTAL_STEPS ? stepHandler : null);
+  const show = (n: number) => revealed >= n;
+
   return (
     <SlideLayout
       title="Common Information Model"
@@ -44,7 +55,9 @@ export function CIMSlide() {
 
         {/* Pipeline — main focus */}
         <motion.div
-          initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}
+          initial={{ opacity: 0, y: 15 }}
+          animate={show(1) ? { opacity: 1, y: 0 } : { opacity: 0, y: 15 }}
+          transition={{ duration: 0.4 }}
           className="bg-white border-2 border-pink-100 rounded-2xl p-5 flex flex-col gap-4"
         >
           <div className="text-xs font-black uppercase tracking-widest text-gray-400 text-center">Normalization Pipeline</div>
@@ -54,18 +67,16 @@ export function CIMSlide() {
 
             {/* Agent sources */}
             <div className="flex flex-col gap-3 shrink-0 w-[130px]">
-              <motion.div initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.2 }}
-                className="bg-orange-50 border-2 border-orange-200 rounded-xl px-3 py-2 text-center flex flex-col items-center gap-1">
+              <div className="bg-orange-50 border-2 border-orange-200 rounded-xl px-3 py-2 text-center flex flex-col items-center gap-1">
                 <img src={openClawLogo} alt="OpenClaw" className="h-5 object-contain" />
                 <div className="text-xs font-black text-orange-400">OpenClaw</div>
                 <div className="text-[10px] text-orange-300 font-mono">plugin</div>
-              </motion.div>
-              <motion.div initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.3 }}
-                className="bg-sky-50 border-2 border-sky-200 rounded-xl px-3 py-2 text-center flex flex-col items-center gap-1">
+              </div>
+              <div className="bg-sky-50 border-2 border-sky-200 rounded-xl px-3 py-2 text-center flex flex-col items-center gap-1">
                 <img src={claudeLogo} alt="Claude Code" className="h-5 w-5 object-contain" />
                 <div className="text-xs font-black text-sky-400">Claude Code</div>
                 <div className="text-[10px] text-sky-300 font-mono">plugin</div>
-              </motion.div>
+              </div>
             </div>
 
             {/* Pipes to hook_events */}
@@ -83,11 +94,10 @@ export function CIMSlide() {
             </div>
 
             {/* Raw stream */}
-            <motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay: 0.4 }}
-              className="bg-gray-50 border-2 border-gray-200 rounded-xl px-3 py-3 text-center shrink-0 whitespace-nowrap">
+            <div className="bg-gray-50 border-2 border-gray-200 rounded-xl px-3 py-3 text-center shrink-0 whitespace-nowrap">
               <div className="text-xs font-black text-gray-300">agentguard_hook_events</div>
               <div className="text-[10px] text-gray-400 mt-1 font-mono">raw stream</div>
-            </motion.div>
+            </div>
 
             {/* Pipes to MVs */}
             <div className="flex flex-col gap-3 flex-1 px-1">
@@ -103,16 +113,14 @@ export function CIMSlide() {
 
             {/* MVs */}
             <div className="flex flex-col gap-3 shrink-0 w-[150px]">
-              <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.5 }}
-                className="bg-orange-50 border-2 border-orange-200 rounded-xl px-3 py-2 text-center">
+              <div className="bg-orange-50 border-2 border-orange-200 rounded-xl px-3 py-2 text-center">
                 <div className="text-xs font-black text-orange-400">mv_cim_openclaw</div>
                 <div className="text-[10px] text-orange-300 mt-0.5">field mapping</div>
-              </motion.div>
-              <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.6 }}
-                className="bg-sky-50 border-2 border-sky-200 rounded-xl px-3 py-2 text-center">
+              </div>
+              <div className="bg-sky-50 border-2 border-sky-200 rounded-xl px-3 py-2 text-center">
                 <div className="text-xs font-black text-sky-400">mv_cim_claudecode</div>
                 <div className="text-[10px] text-sky-300 mt-0.5">field mapping</div>
-              </motion.div>
+              </div>
             </div>
 
             {/* Pipes merging to cim_event */}
@@ -128,25 +136,26 @@ export function CIMSlide() {
             </div>
 
             {/* Unified CIM event */}
-            <motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay: 0.7 }}
-              className="bg-pink-50 border-2 border-pink-300 rounded-xl px-3 py-3 text-center shrink-0 whitespace-nowrap shadow-md shadow-pink-100">
+            <div className="bg-pink-50 border-2 border-pink-300 rounded-xl px-3 py-3 text-center shrink-0 whitespace-nowrap shadow-md shadow-pink-100">
               <div className="text-xs font-black text-pink-500">agentguard_cim_event</div>
               <div className="text-[10px] text-pink-300 mt-1 font-medium">unified · agent-agnostic</div>
-            </motion.div>
+            </div>
 
           </div>
 
-          <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.8 }}
-            className="text-xs text-gray-400 text-center">
+          <p className="text-xs text-gray-400 text-center">
             Views are dropped &amp; recreated on every server startup — field mapping updates take effect immediately with no manual cleanup.
-          </motion.p>
+          </p>
         </motion.div>
 
         {/* Bottom row */}
         <div className="flex gap-4 flex-1 min-h-0">
 
           {/* Bottom-left: Vocabulary mismatch table */}
-          <motion.div initial={{ opacity: 0, x: -15 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.5 }}
+          <motion.div
+            initial={{ opacity: 0, x: -15 }}
+            animate={show(2) ? { opacity: 1, x: 0 } : { opacity: 0, x: -15 }}
+            transition={{ duration: 0.4 }}
             className="flex-[1.2] flex flex-col bg-white border border-gray-200 rounded-2xl overflow-hidden">
             <div className="flex items-center gap-2 px-3 py-2 border-b border-gray-100 shrink-0">
               <Layers size={13} className="text-red-400" />
@@ -176,7 +185,10 @@ export function CIMSlide() {
           {/* Bottom-right: Event types + Metrics stacked */}
           <div className="flex-1 flex flex-col gap-2">
             {/* Canonical event types */}
-            <motion.div initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.5 }}
+            <motion.div
+              initial={{ opacity: 0, y: 15 }}
+              animate={show(3) ? { opacity: 1, y: 0 } : { opacity: 0, y: 15 }}
+              transition={{ duration: 0.4 }}
               className="flex-1 bg-white border border-gray-200 rounded-2xl p-3 flex flex-col">
               <div className="flex items-center justify-between mb-1.5">
                 <span className="text-xs font-black uppercase tracking-widest text-gray-400">Canonical Event Types</span>
@@ -194,7 +206,10 @@ export function CIMSlide() {
             </motion.div>
 
             {/* CIM Metrics */}
-            <motion.div initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.6 }}
+            <motion.div
+              initial={{ opacity: 0, y: 15 }}
+              animate={show(4) ? { opacity: 1, y: 0 } : { opacity: 0, y: 15 }}
+              transition={{ duration: 0.4 }}
               className="flex-1 bg-white border border-gray-200 rounded-2xl p-3 flex flex-col">
               <div className="flex items-center justify-between mb-1.5">
                 <div className="flex items-center gap-2">

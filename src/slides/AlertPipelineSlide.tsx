@@ -1,3 +1,4 @@
+import { ReactNode } from 'react';
 import { motion } from 'motion/react';
 import { SlideLayout } from '../components/Presentation';
 import { ArrowRight, Monitor, ShieldAlert, GitMerge, Filter, Code2, Server } from 'lucide-react';
@@ -12,7 +13,7 @@ function FlowDot({ color, delay }: { color: string; delay: number }) {
   );
 }
 
-function VerticalPipe({ color, children }: { color: string; children?: React.ReactNode }) {
+function VerticalPipe({ color, children }: { color: string; children?: ReactNode }) {
   return (
     <div className="relative w-full flex justify-center" style={{ height: 44 }}>
       <div className={`w-0.5 h-full ${color}`} />

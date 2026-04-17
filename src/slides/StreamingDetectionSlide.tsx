@@ -1,8 +1,10 @@
-import { useState } from 'react';
+import { ReactNode, useCallback, useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { Highlight, themes } from 'prism-react-renderer';
-import { SlideLayout } from '../components/Presentation';
+import { SlideLayout, useSlideStep } from '../components/Presentation';
 import { Code2, X, Zap } from 'lucide-react';
+
+const TOTAL_STEPS = 2;
 
 function FlowDot({ color, delay }: { color: string; delay: number }) {
   return (
@@ -14,7 +16,7 @@ function FlowDot({ color, delay }: { color: string; delay: number }) {
   );
 }
 
-function Pipe({ color, children }: { color: string; children?: React.ReactNode }) {
+function Pipe({ color, children }: { color: string; children?: ReactNode }) {
   return (
     <div className="relative flex-1 h-1.5 flex items-center">
       <div className={`w-full h-0.5 ${color}`} />
@@ -136,6 +138,14 @@ export function StreamingDetectionSlide() {
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const selected = rules.find(r => r.id === selectedId) ?? null;
 
+  const [revealed, setRevealed] = useState(0);
+  const stepHandler = useCallback(() => {
+    if (revealed < TOTAL_STEPS) { setRevealed(n => n + 1); return true; }
+    return false;
+  }, [revealed]);
+  useSlideStep(revealed < TOTAL_STEPS ? stepHandler : null);
+  const show = (n: number) => revealed >= n;
+
   return (
     <SlideLayout
       title="Streaming Detection"
@@ -145,7 +155,7 @@ export function StreamingDetectionSlide() {
 
         {/* Pipeline — prominent */}
         <motion.div
-          initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}
+          initial={{ opacity: 0, y: 15 }} animate={show(1) ? { opacity: 1, y: 0 } : { opacity: 0, y: 15 }} transition={{ duration: 0.4 }}
           className="bg-white border-2 border-pink-100 rounded-2xl p-4 shrink-0"
         >
           <div className="flex items-center gap-2 mb-3">
@@ -188,7 +198,10 @@ export function StreamingDetectionSlide() {
         </motion.div>
 
         {/* Bottom: rules + code */}
-        <div className="flex gap-3 flex-1 min-h-0">
+        <motion.div
+          initial={{ opacity: 0, y: 15 }} animate={show(2) ? { opacity: 1, y: 0 } : { opacity: 0, y: 15 }} transition={{ duration: 0.4 }}
+          className="flex gap-3 flex-1 min-h-0"
+        >
 
           {/* Rule list */}
           <div className="flex flex-col gap-2 w-[46%] shrink-0">
@@ -220,7 +233,7 @@ export function StreamingDetectionSlide() {
                     </div>
                   </div>
                   <button
-                    onClick={() => setSelectedId(isSelected ? null : rule.id)}
+                    onClick={(e) => { e.stopPropagation(); setSelectedId(isSelected ? null : rule.id); }}
                     className={`shrink-0 flex items-center gap-1 text-xs font-bold px-2.5 py-1.5 rounded-lg border transition-colors ${isSelected ? 'bg-violet-500 text-white border-violet-500' : 'bg-violet-50 text-violet-400 border-violet-200 hover:bg-violet-100'}`}
                   >
                     <Code2 size={12} />
@@ -247,7 +260,7 @@ export function StreamingDetectionSlide() {
                       <span className="text-xs text-gray-400">{selected.name}</span>
                       <span className="text-[10px] font-mono text-gray-200 bg-gray-500 px-1.5 py-0.5 rounded">v{selected.version}</span>
                     </div>
-                    <button onClick={() => setSelectedId(null)} className="text-gray-400 hover:text-gray-700 transition-colors">
+                    <button onClick={(e) => { e.stopPropagation(); setSelectedId(null); }} className="text-gray-400 hover:text-gray-700 transition-colors">
                       <X size={14} />
                     </button>
                   </div>
@@ -277,7 +290,7 @@ export function StreamingDetectionSlide() {
             </AnimatePresence>
           </div>
 
-        </div>
+        </motion.div>
       </div>
     </SlideLayout>
   );

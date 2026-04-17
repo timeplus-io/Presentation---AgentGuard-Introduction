@@ -1,6 +1,6 @@
 import { motion } from 'motion/react';
 import { SlideLayout } from '../components/Presentation';
-import { TrendingUp, FileText, Database, Terminal, Cloud, Webhook, Briefcase } from 'lucide-react';
+import { TrendingUp, FileText, Database, Terminal, Cloud, Webhook, Briefcase, ExternalLink } from 'lucide-react';
 
 export function StatusSlide() {
   const capabilities = [
@@ -57,7 +57,10 @@ export function StatusSlide() {
             className="col-span-2 bg-white border border-gray-700 p-8 rounded-2xl shadow-lg relative overflow-hidden"
           >
             <div className="absolute -right-12 -top-12 w-48 h-48 bg-pink-500/5 rounded-full blur-3xl"></div>
-            <div className="text-xs font-bold uppercase tracking-widest text-gray-400 mb-2">Gartner Projection</div>
+            <a href="https://www.gartner.com/en/newsroom/press-releases/2025-08-26-gartner-predicts-40-percent-of-enterprise-apps-will-feature-task-specific-ai-agents-by-2026-up-from-less-than-5-percent-in-2025" target="_blank" rel="noopener noreferrer"
+              className="text-xs font-bold uppercase tracking-widest text-gray-400 mb-2 flex items-center gap-1 hover:text-pink-500 transition-colors w-fit">
+              Gartner Projection <ExternalLink size={10} />
+            </a>
             <div className="flex items-baseline gap-2 mb-2">
               <span className="text-[5rem] font-bold text-gray-100 leading-none tracking-tighter">40<span className="text-pink-500">%</span></span>
             </div>
@@ -75,7 +78,11 @@ export function StatusSlide() {
           >
             <div className="absolute top-0 right-0 w-24 h-24 bg-pink-500/10 rounded-full blur-2xl"></div>
             <div className="text-[10px] font-bold uppercase tracking-widest text-gray-400 mb-4 flex items-center gap-2">
-              <Briefcase size={14} className="text-pink-500" /> McKinsey 2025
+              <Briefcase size={14} className="text-pink-500" />
+              <a href="https://www.mckinsey.com/capabilities/tech-and-ai/our-insights/tech-forward/state-of-ai-trust-in-2026-shifting-to-the-agentic-era" target="_blank" rel="noopener noreferrer"
+                className="hover:text-pink-500 transition-colors flex items-center gap-1">
+                McKinsey 2025 <ExternalLink size={10} />
+              </a>
             </div>
             <div className="text-[3.5rem] font-bold text-gray-100 leading-none mb-2 tracking-tighter relative z-10">
               62<span className="text-pink-500">%</span>
@@ -93,7 +100,11 @@ export function StatusSlide() {
           >
             <div className="absolute top-0 right-0 w-24 h-24 bg-pink-500/10 rounded-full blur-2xl"></div>
             <div className="text-[10px] font-bold uppercase tracking-widest text-gray-400 mb-4 flex items-center gap-2">
-              <TrendingUp size={14} className="text-pink-500" /> McKinsey 2025
+              <TrendingUp size={14} className="text-pink-500" />
+              <a href="https://www.mckinsey.com/capabilities/tech-and-ai/our-insights/tech-forward/state-of-ai-trust-in-2026-shifting-to-the-agentic-era" target="_blank" rel="noopener noreferrer"
+                className="hover:text-pink-500 transition-colors flex items-center gap-1">
+                McKinsey 2025 <ExternalLink size={10} />
+              </a>
             </div>
             <div className="text-[3.5rem] font-bold text-gray-100 leading-none mb-2 tracking-tighter relative z-10">
               23<span className="text-pink-500">%</span>
