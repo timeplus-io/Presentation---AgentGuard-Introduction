@@ -1,4 +1,4 @@
-import { ReactNode, useEffect, useState } from 'react';
+import { ReactNode, useEffect, useRef, useState } from 'react';
 import { AnimatePresence, motion } from 'motion/react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 
@@ -9,6 +9,8 @@ interface PresentationProps {
 export function Presentation({ slides }: PresentationProps) {
   const [currentSlide, setCurrentSlide] = useState(0);
   const [direction, setDirection] = useState(0);
+  const isFirst = useRef(true);
+  useEffect(() => { isFirst.current = false; }, []);
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -68,12 +70,12 @@ export function Presentation({ slides }: PresentationProps) {
           aspectRatio: '16 / 9'
         }}
       >
-        <AnimatePresence initial={false} custom={direction}>
+        <AnimatePresence custom={direction}>
           <motion.div
             key={currentSlide}
             custom={direction}
             variants={variants}
-            initial="enter"
+            initial={isFirst.current ? { x: 0, opacity: 0 } : 'enter'}
             animate="center"
             exit="exit"
             transition={{
