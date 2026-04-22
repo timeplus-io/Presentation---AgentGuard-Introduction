@@ -1,7 +1,7 @@
 // Page 2
 import { motion } from 'motion/react';
 import { SlideLayout, useSlideNav } from '../components/Presentation';
-import { TrendingUp, ShieldOff, AlertTriangle, Zap, Layers, Database, GitMerge, Activity, Bell, Play, ExternalLink } from 'lucide-react';
+import { TrendingUp, ShieldOff, AlertTriangle, Zap, Layers, Database, GitMerge, Activity, Bell, Brain, Sparkles, Play, ExternalLink } from 'lucide-react';
 
 const ITEMS = [
   { index: 2, num: '03', label: 'The Current Status of AI Agents', desc: 'Scale, economics, and the growing risk surface', icon: TrendingUp, color: 'bg-blue-500', ring: 'ring-blue-200', card: 'bg-blue-50 border-blue-200' },
@@ -13,8 +13,10 @@ const ITEMS = [
   { index: 8, num: '09', label: 'Common Information Model', desc: 'One schema for all agents — rules written once', icon: GitMerge, color: 'bg-orange-500', ring: 'ring-orange-200', card: 'bg-orange-50 border-orange-200' },
   { index: 9, num: '10', label: 'Streaming Detection', desc: 'SQL materialized views as always-on security rules', icon: Activity, color: 'bg-pink-500', ring: 'ring-pink-200', card: 'bg-pink-50 border-pink-200' },
   { index: 10, num: '11', label: 'Alert Pipeline', desc: 'Detection → dedup → lifecycle → live browser UI', icon: Bell, color: 'bg-red-500', ring: 'ring-red-200', card: 'bg-red-50 border-red-200' },
-  { index: 11, num: '12', label: 'Live Demo', desc: 'See AgentGuard catch real threats in real time', icon: Play, color: 'bg-green-500', ring: 'ring-green-200', card: 'bg-green-50 border-green-200' },
-  { index: 12, num: '13', label: 'Get Started', desc: 'Docs, install guide, Slack, and GitHub', icon: ExternalLink, color: 'bg-gray-500', ring: 'ring-gray-200', card: 'bg-gray-50 border-gray-200' },
+  { index: 11, num: '12', label: 'Memory Monitoring', desc: 'Track every read/write across auto-memory, MCP, OpenClaw', icon: Brain, color: 'bg-fuchsia-500', ring: 'ring-fuchsia-200', card: 'bg-fuchsia-50 border-fuchsia-200' },
+  { index: 12, num: '13', label: 'Skills Monitoring', desc: 'Watch loaded vs invoked skills; flag workspace-planted ones', icon: Sparkles, color: 'bg-amber-500', ring: 'ring-amber-200', card: 'bg-amber-50 border-amber-200' },
+  { index: 13, num: '14', label: 'Live Demo', desc: 'See AgentGuard catch real threats in real time', icon: Play, color: 'bg-green-500', ring: 'ring-green-200', card: 'bg-green-50 border-green-200' },
+  { index: 14, num: '15', label: 'Get Started', desc: 'Docs, install guide, Slack, and GitHub', icon: ExternalLink, color: 'bg-gray-500', ring: 'ring-gray-200', card: 'bg-gray-50 border-gray-200' },
 ];
 
 const COL_A = ITEMS.slice(0, 6);

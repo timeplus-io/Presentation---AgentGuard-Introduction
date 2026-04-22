@@ -10,8 +10,10 @@ import { DataCollectionSlide } from './slides/08_DataCollectionSlide';
 import { CIMSlide } from './slides/09_CIMSlide';
 import { StreamingDetectionSlide } from './slides/10_StreamingDetectionSlide';
 import { AlertPipelineSlide } from './slides/11_AlertPipelineSlide';
-import { DemoSlide } from './slides/12_DemoSlide';
-import { CallToActionSlide } from './slides/13_CallToActionSlide';
+import { MemoryMonitorSlide } from './slides/12_MemoryMonitorSlide';
+import { SkillsMonitorSlide } from './slides/13_SkillsMonitorSlide';
+import { DemoSlide } from './slides/14_DemoSlide';
+import { CallToActionSlide } from './slides/15_CallToActionSlide';
 
 export default function App() {
   const slides = [
@@ -26,6 +28,8 @@ export default function App() {
     <CIMSlide key="cim" />,
     <StreamingDetectionSlide key="detection" />,
     <AlertPipelineSlide key="alertpipeline" />,
+    <MemoryMonitorSlide key="memory" />,
+    <SkillsMonitorSlide key="skills" />,
     <DemoSlide key="demo" />,
     <CallToActionSlide key="cta" />
   ];
