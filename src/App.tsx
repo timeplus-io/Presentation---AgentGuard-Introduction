@@ -12,6 +12,7 @@ import { StreamingDetectionSlide } from './slides/10_StreamingDetectionSlide';
 import { AlertPipelineSlide } from './slides/11_AlertPipelineSlide';
 import { MemoryMonitorSlide } from './slides/12_MemoryMonitorSlide';
 import { SkillsMonitorSlide } from './slides/13_SkillsMonitorSlide';
+import { ResearchTeamSlide } from './slides/14_ResearchTeamSlide';
 import { DemoSlide } from './slides/14_DemoSlide';
 import { CallToActionSlide } from './slides/15_CallToActionSlide';
 
@@ -30,6 +31,7 @@ export default function App() {
     <AlertPipelineSlide key="alertpipeline" />,
     <MemoryMonitorSlide key="memory" />,
     <SkillsMonitorSlide key="skills" />,
+    <ResearchTeamSlide key="research" />,
     <DemoSlide key="demo" />,
     <CallToActionSlide key="cta" />
   ];
