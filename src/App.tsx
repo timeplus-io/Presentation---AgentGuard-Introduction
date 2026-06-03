@@ -10,6 +10,7 @@ import { DataCollectionSlide } from './slides/08_DataCollectionSlide';
 import { CIMSlide } from './slides/09_CIMSlide';
 import { StreamingDetectionSlide } from './slides/10_StreamingDetectionSlide';
 import { AlertPipelineSlide } from './slides/11_AlertPipelineSlide';
+import { HoldsSlide } from './slides/11b_HoldsSlide';
 import { MemoryMonitorSlide } from './slides/12_MemoryMonitorSlide';
 import { SkillsMonitorSlide } from './slides/13_SkillsMonitorSlide';
 import { ResearchTeamSlide } from './slides/14_ResearchTeamSlide';
@@ -29,6 +30,7 @@ export default function App() {
     <CIMSlide key="cim" />,
     <StreamingDetectionSlide key="detection" />,
     <AlertPipelineSlide key="alertpipeline" />,
+    <HoldsSlide key="holds" />,
     <MemoryMonitorSlide key="memory" />,
     <SkillsMonitorSlide key="skills" />,
     <ResearchTeamSlide key="research" />,
